@@ -1,5 +1,5 @@
 pub fn template() -> String {
-  String::from(r#"<!DOCTYPE html>
+  String::from(r###"<!DOCTYPE html>
 <html>
   <head>
     <title>
@@ -11,6 +11,15 @@ pub fn template() -> String {
         - https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css
         - https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.3/css/bulma.min.css
     -->
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://bulma.io/favicons/apple-touch-icon.png?v=201701041855">
+    <link rel="icon" type="image/png" href="https://bulma.io/favicons/favicon-32x32.png?v=201701041855" sizes="32x32">
+    <link rel="icon" type="image/png" href="https://bulma.io/favicons/favicon-16x16.png?v=201701041855" sizes="16x16">
+    <!-- link rel="manifest" href="https://bulma.io/favicons/manifest.json?v=201701041855" -->
+    <link rel="mask-icon" href="https://bulma.io/favicons/safari-pinned-tab.svg?v=201701041855" color="#00d1b2">
+    <link rel="shortcut icon" href="https://bulma.io/favicons/favicon.ico?v=201701041855">
+    <meta name="msapplication-config" content="https://bulma.io/favicons/browserconfig.xml?v=201701041855">
+    <meta name="theme-color" content="#00d1b2">
   </head>
   <body>
     <section class="hero is-primary">
@@ -47,15 +56,13 @@ pub fn template() -> String {
     </section>
     <footer class="footer">
       <div class="content has-text-centered">
-        <p>
-          <strong>Bulma</strong> by <a href="https://jgthms.com">Jeremy Thomas</a>. 
-          The source code is licensed <a href="https://opensource.org/license/mit">MIT</a>. 
-          The website content is licensed 
-          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY NC SA 4.0</a>.
-        </p>
+        <strong>Bulma</strong> by <a href="https://jgthms.com">Jeremy Thomas</a>. 
+        The source code is licensed <a href="https://opensource.org/license/mit">MIT</a>. 
+        The website content is licensed 
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY NC SA 4.0</a>.
       </div>
     </footer>
   </body>
 </html>
-"#)
+"###)
 }
