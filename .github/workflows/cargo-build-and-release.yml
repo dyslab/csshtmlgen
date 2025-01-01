@@ -1,0 +1,43 @@
+name: Cargo build and release for Rust project
+
+on:
+  # push:
+  #   branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_and_release:
+
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Cargo build On Windows and set variable 'version' to GITHUB_OUTPUT
+        id: build
+        run: |
+          cargo build --release --verbose
+          ls -lhR ./target/release/
+          echo "version=v$(cargo metadata --format-version 1 | jq -j .packages[0].version)" >> $GITHUB_OUTPUT
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact
+          path: |
+            ./target/release/*.exe
+          overwrite: true
+
+      - name: Release Artifact
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./target/release/*.exe
+          tag_name: ${{ steps.build.outputs.version }}
+          body: |
+            ${{ steps.build.outputs.version }} launched.
+          draft: false
+          prerelease: false

@@ -8,7 +8,7 @@ Dev. OS: Windows 10 / 11
 
 Dev. Tools: [VS Code](https://code.visualstudio.com/)
 
-Programming language & Build system: [Rust](https://www.rust-lang.org/) & [Cargo](https://doc.rust-lang.org/book/ch01-03-hello-cargo.html)
+Programming language & Build system: [Rust](https://www.rust-lang.org/) & [Cargo](https://doc.rust-lang.org/cargo/index.html)
 
 Supported CSS Frameworks: [Bulma](https://bulma.io/) / [Simple.css](https://simplecss.org/)
 
