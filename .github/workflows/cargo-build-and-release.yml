@@ -10,9 +10,10 @@ env:
 
 jobs:
   build_and_release:
-
     runs-on: windows-latest
-
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
       
@@ -38,6 +39,6 @@ jobs:
             ./target/release/*.exe
           tag_name: ${{ steps.build.outputs.version }}
           body: |
-            ${{ steps.build.outputs.version }} launched.
+            ${{ steps.build.outputs.version }} on Windows x86_64 platform launched.
           draft: false
           prerelease: false
