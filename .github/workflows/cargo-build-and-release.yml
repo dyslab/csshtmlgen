@@ -12,11 +12,29 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_and_release_on_linux:
-    runs-on: ubuntu-latest
+
+  build_and_release:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            app_suffix: "-linux-amd64"
+            app_extention: ""
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            app_suffix: "-macos-arm64"
+            app_extention: ""
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            app_suffix: "-windows-amd64"
+            app_extention: ".exe"
+    runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash
+    outputs:
+      version: ${{ steps.build.outputs.version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -30,15 +48,17 @@ jobs:
           # set environment variable used in this step
           origin_name=$(cargo metadata --format-version 1 | jq -j .packages[0].name)
           origin_app="$origin_name"
-          target="x86_64-unknown-linux-gnu"
-          target_app_suffix="-linux-amd64"
+          target="${{ matrix.target }}"
           target_dir="./target/$target/release"
-          target_app="$origin_name$target_app_suffix"
+          target_app="$origin_name${{ matrix.app_suffix }}${{ matrix.app_extention }}"
       
+          # add target to rustup for sure
+          rustup target add $target
+
           # build the project
           cargo build --release --verbose --target $target
 
-          ls -lhR $target_dir # for debug
+          # ls -lhR $target_dir # for debug
 
           # rename the file to the name of the project         
           mv "$target_dir/$origin_app" "$target_dir/$target_app"
@@ -55,59 +75,17 @@ jobs:
             ${{ steps.build.outputs.target_dir }}/${{ steps.build.outputs.target_app }}
           tag_name: ${{ steps.build.outputs.version }}
 
-  build_and_release_on_windows:
-    needs: build_and_release_on_linux
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: bash
+  release_update:
+    needs: build_and_release
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      - name: Cargo build On Windows and set variables to GITHUB_OUTPUT
-        id: build
-        run: |
-          # show supported targets
-          rustup show
-
-          # set environment variable used in this step
-          origin_name=$(cargo metadata --format-version 1 | jq -j .packages[0].name)
-          origin_exe="$origin_name.exe"
-          target="x86_64-pc-windows-msvc"
-          target_exe_suffix="-windows-amd64"
-          target_dir="./target/$target/release"
-          target_exe="$origin_name$target_exe_suffix.exe"
-      
-          # build the project
-          cargo build --release --verbose --target $target
-
-          # ls -lhR $target_dir # for debug
-
-          # rename the file to the name of the project         
-          mv "$target_dir/$origin_exe" "$target_dir/$target_exe"
-          
-          # set variable to GITHUB_OUTPUT
-          echo "target_dir=$target_dir" >> $GITHUB_OUTPUT
-          echo "target_exe=$target_exe" >> $GITHUB_OUTPUT
-          echo "version=v$(cargo metadata --format-version 1 | jq -j .packages[0].version)" >> $GITHUB_OUTPUT
-
-      # - name: Upload Artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: artifact
-      #     path: |
-      #       ${{ steps.build.outputs.target_dir }}/${{ steps.build.outputs.target_exe }}
-      #     overwrite: true
-
-      - name: Release Artifact
+      - name: Release Update
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            ${{ steps.build.outputs.target_dir }}/${{ steps.build.outputs.target_exe }}
-          tag_name: ${{ steps.build.outputs.version }}
-          # body: |
-          #   The app for Windows x64 / amd64 platform: ${{ steps.build.outputs.target_exe }}
-          body_path: ./${{ steps.build.outputs.version }}.md
+          tag_name: ${{ needs.build_and_release.outputs.version }}
+          body_path: ./${{ needs.build_and_release.outputs.version }}.md
           draft: false
           prerelease: false
