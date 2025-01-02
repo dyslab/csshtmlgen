@@ -24,15 +24,15 @@ cargo build --release
 cargo build --release --target "x86_64-pc-windows-msvc"
 # Expected: target/x86_64-pc-windows-msvc/release/csshtmlgen.exe
 
-cargo build --release --target "x86_64-unknown-linux-musl"
-# Expected: target/x86_64-unknown-linux-musl/release/csshtmlgen
+cargo build --release --target "x86_64-unknown-linux-gnu"
+# Expected: target/x86_64-unknown-linux-gnu/release/csshtmlgen
 
 cargo build --release --target "aarch64-apple-darwin"
 # Expected: target/aarch64-apple-darwin/release/csshtmlgen
 
 # Or, use the following command to build all artifacts at once in case you have 
 # multi-architecture libraries installed successfully by Rustup
-# cargo build --release --target "x86_64-pc-windows-msvc" --target "x86_64-unknown-linux-musl" --target "aarch64-apple-darwin"
+# cargo build --release --target "x86_64-pc-windows-msvc" --target "x86_64-unknown-linux-gnu" --target "aarch64-apple-darwin"
 ```
 
 ## Usage
@@ -44,11 +44,11 @@ cargo build --release --target "aarch64-apple-darwin"
 .\target\x86_64-pc-windows-msvc\release\csshtmlgen.exe
 ```
 
-- On Linux (based on CPU architecture: x86_64-unknown-linux-musl):  _**Yet to do!**_
+- On Linux (based on CPU architecture: x86_64-unknown-linux-gnu):  _**Yet to do!**_
 
 ```bash
-# Execute in the Bash terminal, `chmod 755 ./target/x86_64-unknown-linux-musl/release/csshtmlgen` first if you have not done so
-./target/x86_64-unknown-linux-musl/release/csshtmlgen
+# Execute in the Bash terminal, `chmod 755 ./target/x86_64-unknown-linux-gnu/release/csshtmlgen` first if you have not done so
+./target/x86_64-unknown-linux-gnu/release/csshtmlgen
 ```
 
 - On MacOS (based on CPU architecture: aarch64-apple-darwin): _**Yet to do!**_
