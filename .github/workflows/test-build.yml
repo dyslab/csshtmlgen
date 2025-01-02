@@ -1,4 +1,4 @@
-name: Test on Linux
+name: Test Build
 
 on:
   # push:
@@ -12,8 +12,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_and_release:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: macos-latest
     defaults:
       run:
         shell: bash
@@ -29,12 +29,13 @@ jobs:
           # set environment variable used in this step
           origin_name=$(cargo metadata --format-version 1 | jq -j .packages[0].name)
           origin_app="$origin_name"
-          target="x86_64-unknown-linux-gnu"
-          target_app_suffix="-linux-amd64"
+          target="aarch64-apple-darwin"
+          target_app_suffix="-macos-arm64"
           target_dir="./target/$target/release"
-          target_app="$origin_name$target_app_suffix.exe"
+          target_app="$origin_name$target_app_suffix"
       
           # build the project
+          rustup target add $target
           cargo build --release --verbose --target $target
 
           ls -lhR $target_dir # for debug
@@ -46,22 +47,3 @@ jobs:
           echo "target_dir=$target_dir" >> $GITHUB_OUTPUT
           echo "target_app=$target_app" >> $GITHUB_OUTPUT
           echo "version=v$(cargo metadata --format-version 1 | jq -j .packages[0].version)" >> $GITHUB_OUTPUT
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: artifact
-          path: |
-            ${{ steps.build.outputs.target_dir }}/${{ steps.build.outputs.target_app }}
-          overwrite: true
-
-      #- name: Release Artifact
-      #  uses: softprops/action-gh-release@v1
-      #  with:
-      #    files: |
-      #      ${{ steps.build.outputs.target_dir }}/${{ steps.build.outputs.target_app }}
-      #    tag_name: ${{ steps.build.outputs.version }}
-      #    body: |
-      #      The app for Linux x64 / amd64 platform: ${{ steps.build.outputs.target_app }}
-      #    draft: false
-      #    prerelease: false

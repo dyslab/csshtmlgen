@@ -12,13 +12,58 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_and_release:
+  build_and_release_on_linux:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cargo build On Linux and set variables to GITHUB_OUTPUT
+        id: build
+        run: |
+          # show supported targets
+          rustup show
+
+          # set environment variable used in this step
+          origin_name=$(cargo metadata --format-version 1 | jq -j .packages[0].name)
+          origin_app="$origin_name"
+          target="x86_64-unknown-linux-gnu"
+          target_app_suffix="-linux-amd64"
+          target_dir="./target/$target/release"
+          target_app="$origin_name$target_app_suffix"
+      
+          # build the project
+          cargo build --release --verbose --target $target
+
+          ls -lhR $target_dir # for debug
+
+          # rename the file to the name of the project         
+          mv "$target_dir/$origin_app" "$target_dir/$target_app"
+          
+          # set variable to GITHUB_OUTPUT
+          echo "target_dir=$target_dir" >> $GITHUB_OUTPUT
+          echo "target_app=$target_app" >> $GITHUB_OUTPUT
+          echo "version=v$(cargo metadata --format-version 1 | jq -j .packages[0].version)" >> $GITHUB_OUTPUT
+
+      - name: Release Artifact
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ${{ steps.build.outputs.target_dir }}/${{ steps.build.outputs.target_app }}
+          tag_name: ${{ steps.build.outputs.version }}
+
+  build_and_release_on_windows:
+    needs: build_and_release_on_linux
     runs-on: windows-latest
     defaults:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
       
       - name: Cargo build On Windows and set variables to GITHUB_OUTPUT
         id: build
@@ -47,13 +92,13 @@ jobs:
           echo "target_exe=$target_exe" >> $GITHUB_OUTPUT
           echo "version=v$(cargo metadata --format-version 1 | jq -j .packages[0].version)" >> $GITHUB_OUTPUT
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: artifact
-          path: |
-            ${{ steps.build.outputs.target_dir }}/${{ steps.build.outputs.target_exe }}
-          overwrite: true
+      # - name: Upload Artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: artifact
+      #     path: |
+      #       ${{ steps.build.outputs.target_dir }}/${{ steps.build.outputs.target_exe }}
+      #     overwrite: true
 
       - name: Release Artifact
         uses: softprops/action-gh-release@v1
@@ -61,7 +106,8 @@ jobs:
           files: |
             ${{ steps.build.outputs.target_dir }}/${{ steps.build.outputs.target_exe }}
           tag_name: ${{ steps.build.outputs.version }}
-          body: |
-            The app for Windows x64 / amd64 platform: ${{ steps.build.outputs.target_exe }}
+          # body: |
+          #   The app for Windows x64 / amd64 platform: ${{ steps.build.outputs.target_exe }}
+          body_path: ./${{ steps.build.outputs.version }}.md
           draft: false
           prerelease: false
