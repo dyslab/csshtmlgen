@@ -10,9 +10,11 @@ Dev. Tools: [VS Code](https://code.visualstudio.com/)
 
 Programming language & Build system: [Rust](https://www.rust-lang.org/) & [Cargo](https://doc.rust-lang.org/cargo/index.html)
 
-Supported CSS Frameworks: [Bulma](https://bulma.io/) / [Simple.css](https://simplecss.org/)
+Supported CSS Frameworks: [Bulma](https://bulma.io/) / [Tailwind](https://tailwindcss.com/) / [Bootstrap](https://getbootstrap.com/) / [Simple.css](https://simplecss.org/)
 
-## Build
+## Build from the source
+
+Fork the repository or download the zip archive of source codes, then build locally
 
 ```powershell
 cargo build --release
@@ -35,6 +37,8 @@ cargo build --release --target "aarch64-apple-darwin"
 # cargo build --release --target "x86_64-pc-windows-msvc" --target "x86_64-unknown-linux-gnu" --target "aarch64-apple-darwin"
 ```
 
+> NOTE: the project was manually built and released by the Github actions for demonstration purpose.
+
 ## Usage
 
 - On Windows (based on CPU architecture: x86_64-pc-windows-msvc):
@@ -44,14 +48,14 @@ cargo build --release --target "aarch64-apple-darwin"
 .\target\x86_64-pc-windows-msvc\release\csshtmlgen.exe
 ```
 
-- On Linux (based on CPU architecture: x86_64-unknown-linux-gnu):  _**Yet to do!**_
+- On Linux (based on CPU architecture: x86_64-unknown-linux-gnu):
 
 ```bash
 # Execute in the Bash terminal, `chmod 755 ./target/x86_64-unknown-linux-gnu/release/csshtmlgen` first if you have not done so
 ./target/x86_64-unknown-linux-gnu/release/csshtmlgen
 ```
 
-- On MacOS (based on CPU architecture: aarch64-apple-darwin): _**Yet to do!**_
+- On MacOS (based on CPU architecture: aarch64-apple-darwin):
 
 ```zsh
 # Execute in the Zsh terminal, `chmod 755 ./target/aarch64-apple-darwin/release/csshtmlgen` first if you have not done so
